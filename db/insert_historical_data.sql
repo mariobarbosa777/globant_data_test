@@ -15,7 +15,10 @@ FROM temp_departments
 WHERE id IS NOT NULL AND department IS NOT NULL;
 
 INSERT INTO rejected_records (table_name, raw_data, error_message)
-SELECT 'departments', CONCAT(id, ',', department), 'Null values found'
+SELECT 
+    'departments', 
+    json_build_object('id', id, 'department', department)::JSONB, 
+    'Null values found'
 FROM temp_departments
 WHERE id IS NULL OR department IS NULL;
 
@@ -37,7 +40,10 @@ FROM temp_jobs
 WHERE id IS NOT NULL AND job IS NOT NULL;
 
 INSERT INTO rejected_records (table_name, raw_data, error_message)
-SELECT 'jobs', CONCAT(id, ',', job), 'Null values found'
+SELECT 
+    'jobs', 
+    json_build_object('id', id, 'job', job)::JSONB, 
+    'Null values found'
 FROM temp_jobs
 WHERE id IS NULL OR job IS NULL;
 
@@ -66,7 +72,10 @@ WHERE id IS NOT NULL
   AND job_id IS NOT NULL;
 
 INSERT INTO rejected_records (table_name, raw_data, error_message)
-SELECT 'hired_employees', CONCAT(id, ',', name, ',', datetime, ',', department_id, ',', job_id), 'Null values found'
+SELECT 
+    'hired_employees', 
+    json_build_object('id', id, 'name', name, 'datetime', datetime, 'department_id', department_id, 'job_id', job_id)::JSONB, 
+    'Null values found'
 FROM temp_hired_employees
 WHERE id IS NULL OR name IS NULL OR datetime IS NULL OR department_id IS NULL OR job_id IS NULL;
 
