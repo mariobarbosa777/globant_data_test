@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS hired_employees (
 CREATE TABLE IF NOT EXISTS rejected_records (
     id SERIAL PRIMARY KEY,
     table_name VARCHAR(50) NOT NULL,
-    raw_data TEXT NOT NULL,
+    raw_data JSONB NULL,
     error_message TEXT NOT NULL,
     rejected_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
