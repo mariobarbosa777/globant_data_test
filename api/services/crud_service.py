@@ -10,6 +10,42 @@ from fastapi import Request
 
 LIMIT = 1000  # 🔹 Límite máximo de registros a devolver
 
+async def insert_record(db: AsyncSession, model, data):
+    """
+    Inserta un único registro en la base de datos.
+    """
+    try:
+        record = model(**data)
+        db.add(record)
+        await db.commit()
+        await db.refresh(record)
+        return record
+    except IntegrityError:
+        await db.rollback()
+        return None  
+
+async def process_batch_insert(db: AsyncSession, request: Request, model, table_name: str, batch_data: list[dict]):
+    """
+    Procesa la inserción de un batch de registros.  
+    - Inserta registros válidos en la tabla correspondiente.  
+    - Registra los fallidos en `rejected_records`.  
+    """
+    inserted_records = []
+    rejected_records = []
+
+    for data in batch_data:
+        record = await insert_record(db, model, data)
+        if record:
+            inserted_records.append(record)
+        else:
+            rejected_records.append(data)
+
+    if rejected_records:
+        await handle_rejected_record(request, db, table_name, rejected_records, "IntegrityError: Registro duplicado o inválido")
+
+    return inserted_records 
+        
+
 # 📌 Funciones para Departments
 async def get_all_departments(db: AsyncSession):
     result = await db.execute(select(Department).limit(LIMIT))  # 🔥 Aplica el límite
@@ -20,15 +56,9 @@ async def create_departments_batch(
     department_batch: list[DepartmentCreate],
     request: Request
     ):
-    try:
-        new_departments = [Department(**dep.dict()) for dep in department_batch]
-        db.add_all(new_departments)
-        await db.commit()
-        return new_departments
+    
+    return await process_batch_insert(db, request, Department, "departments", [dep.dict() for dep in department_batch])
 
-    except IntegrityError as e:
-        await db.rollback()
-        return await handle_rejected_record(request, db, "departments", [dep.dict() for dep in department_batch], e)
 
 
 # 📌 Funciones para Jobs
@@ -41,15 +71,8 @@ async def create_jobs_batch(
     job_batch: list[JobCreate],
     request: Request
     ):
-    try:
-        new_jobs = [Job(**job.dict()) for job in job_batch]
-        db.add_all(new_jobs)
-        await db.commit()
-        return new_jobs
 
-    except IntegrityError as e:
-        await db.rollback()
-        return await handle_rejected_record(request, db, "job", [job.dict() for job in job_batch], e)
+    return await process_batch_insert(db, request, Job, "jobs", [job.dict() for job in job_batch])
 
 # 📌 Funciones para Employees
 async def get_all_employees(db: AsyncSession):
@@ -61,12 +84,5 @@ async def create_employees_batch(
     employee_batch: list[EmployeeCreate],
     request: Request
     ):
-    try:
-        new_employees = [HiredEmployee(**emp.dict()) for emp in employee_batch]
-        db.add_all(new_employees)
-        await db.commit()
-        return new_employees
 
-    except IntegrityError as e:
-        await db.rollback()
-        return await handle_rejected_record(request, db, "hired_employees", [emp.dict() for emp in employee_batch], e)
+    return await process_batch_insert(db, request, HiredEmployee, "hired_employees", [emp.dict() for emp in employee_batch])
