@@ -4,6 +4,8 @@ from models import Department, Job, HiredEmployee
 from schemas.department_schema import DepartmentCreate
 from schemas.job_schema import JobCreate
 from schemas.employee_schema import EmployeeCreate
+from api.utils.error_handler import handle_rejected_record
+
 
 LIMIT = 1000  # 🔹 Límite máximo de registros a devolver
 
@@ -13,13 +15,15 @@ async def get_all_departments(db: AsyncSession):
     return result.scalars().all()
 
 async def create_departments_batch(db: AsyncSession, department_batch: list[DepartmentCreate]):
-    new_departments = [Department(**dep.dict()) for dep in department_batch]
+    try:
+        new_departments = [Department(**dep.dict()) for dep in department_batch]
+        db.add_all(new_departments)
+        await db.commit()
+        return new_departments
 
-    print("Datos a insertar:", [dep.__dict__ for dep in new_departments])
-
-    db.add_all(new_departments)
-    await db.commit()
-    return new_departments
+    except IntegrityError as e:
+        await db.rollback()
+        return await handle_rejected_record(request, db, "departments", [dep.dict() for dep in department_batch], e)
 
 
 # 📌 Funciones para Jobs
@@ -28,10 +32,15 @@ async def get_all_jobs(db: AsyncSession):
     return result.scalars().all()
 
 async def create_jobs_batch(db: AsyncSession, job_batch: list[JobCreate]):
-    new_jobs = [Job(**job.dict()) for job in job_batch]
-    db.add_all(new_jobs)
-    await db.commit()
-    return new_jobs
+    try:
+        new_jobs = [Job(**job.dict()) for job in job_batch]
+        db.add_all(new_jobs)
+        await db.commit()
+        return new_jobs
+
+    except IntegrityError as e:
+        await db.rollback()
+        return await handle_rejected_record(request, db, "job", [job.dict() for job in job_batch], e)
 
 # 📌 Funciones para Employees
 async def get_all_employees(db: AsyncSession):
@@ -39,7 +48,12 @@ async def get_all_employees(db: AsyncSession):
     return result.scalars().all()
 
 async def create_employees_batch(db: AsyncSession, employee_batch: list[EmployeeCreate]):
-    new_employees = [HiredEmployee(**emp.dict()) for emp in employee_batch]
-    db.add_all(new_employees)
-    await db.commit()
-    return new_employees
+    try:
+        new_employees = [HiredEmployee(**emp.dict()) for emp in employee_batch]
+        db.add_all(new_employees)
+        await db.commit()
+        return new_employees
+        
+    except IntegrityError as e:
+        await db.rollback()
+        return await handle_rejected_record(request, db, "hired_employees", [emp.dict() for emp in employee_batch], e)
