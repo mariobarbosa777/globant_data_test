@@ -29,7 +29,19 @@ async def db_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
         content={
-            "detail": "An unexpected error occurred.",
-            "error_details": error_details
+            "detail": "Error inesperado.",
+            "message": "Ocurrió un error desconocido.",
+            "path": request.url.path
+        }
+    )
+
+
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Error interno del servidor.",
+            "message": "Ocurrió un error inesperado. Contacta al soporte si el problema persiste.",
+            "path": request.url.path
         }
     )

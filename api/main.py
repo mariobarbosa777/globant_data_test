@@ -2,8 +2,9 @@ from fastapi import FastAPI
 from config import settings
 from routers import crud
 from utils.logger import LoggingMiddleware
-from utils.error_handler import db_exception_handler
+from utils.error_handler import db_exception_handler, global_exception_handler
 from utils.middleware import setup_middlewares  
+from sqlalchemy.exc import SQLAlchemyError
 
 # Inicializar FastAPI
 app = FastAPI(
@@ -20,6 +21,7 @@ app.add_middleware(LoggingMiddleware)
 
 # Agregar manejo global de errores de base de datos
 app.add_exception_handler(SQLAlchemyError, db_exception_handler)
+app.add_exception_handler(Exception, global_exception_handler)
 
 
 # # Registrar routers
