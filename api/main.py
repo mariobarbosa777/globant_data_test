@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from config import settings
-# from api.routers import departments, jobs, employees
+from routers import crud
 from utils.logger import LoggingMiddleware
 from utils.middleware import setup_middlewares  
 
@@ -18,7 +18,7 @@ setup_middlewares(app)
 app.add_middleware(LoggingMiddleware)
 
 # # Registrar routers
-# app.include_router(departments.router, prefix="/departments", tags=["Departments"])
+app.include_router(crud.router, prefix="/crud", tags=["CRUD"])
 # app.include_router(jobs.router, prefix="/jobs", tags=["Jobs"])
 # app.include_router(employees.router, prefix="/employees", tags=["Employees"])
 
