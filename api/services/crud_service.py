@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from api.models import Department, Job, HiredEmployee
-from api.schemas.department_schema import DepartmentCreate
-from api.schemas.job_schema import JobCreate
-from api.schemas.employee_schema import EmployeeCreate
+from models import Department, Job, HiredEmployee
+from schemas.department_schema import DepartmentCreate
+from schemas.job_schema import JobCreate
+from schemas.employee_schema import EmployeeCreate
 
 LIMIT = 1000  # 🔹 Límite máximo de registros a devolver
 
