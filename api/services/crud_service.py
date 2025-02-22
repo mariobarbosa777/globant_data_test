@@ -14,6 +14,9 @@ async def get_all_departments(db: AsyncSession):
 
 async def create_departments_batch(db: AsyncSession, department_batch: list[DepartmentCreate]):
     new_departments = [Department(**dep.dict()) for dep in department_batch]
+
+    print("Datos a insertar:", [dep.__dict__ for dep in new_departments])
+
     db.add_all(new_departments)
     await db.commit()
     return new_departments
