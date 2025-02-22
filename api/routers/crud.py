@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from schemas.department_schema import DepartmentBatchCreate, DepartmentResponse
@@ -19,10 +19,11 @@ async def list_departments(db: AsyncSession = Depends(get_db)):
 
 @router.post("/departments/batch/", response_model=list[DepartmentResponse])
 async def add_departments_batch(
+    request: Request,
     department_batch: DepartmentBatchCreate, 
     db: AsyncSession = Depends(get_db)
 ):
-    return await create_departments_batch(db, department_batch.departments)
+    return await create_departments_batch(db, department_batch.departments, request)
 
 
 # 📌 Endpoints CRUD para Jobs
@@ -32,10 +33,11 @@ async def list_jobs(db: AsyncSession = Depends(get_db)):
 
 @router.post("/jobs/batch/", response_model=list[JobResponse])
 async def add_jobs_batch(
+    request: Request,
     job_batch: JobBatchCreate, 
     db: AsyncSession = Depends(get_db)
 ):
-    return await create_jobs_batch(db, job_batch.jobs)
+    return await create_jobs_batch(db, job_batch.jobs, request)
 
 
 # 📌 Endpoints CRUD para Employees
@@ -45,7 +47,8 @@ async def list_employees(db: AsyncSession = Depends(get_db)):
     
 @router.post("/employees/batch/", response_model=list[EmployeeResponse])
 async def add_employees_batch(
+    request: Request,
     employee_batch: EmployeeBatchCreate, 
     db: AsyncSession = Depends(get_db)
 ):
-    return await create_employees_batch(db, employee_batch.employees)
+    return await create_employees_batch(db, employee_batch.employees, request)
