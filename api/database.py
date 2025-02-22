@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from config import settings
-from services.aws_service import get_aws_secret 
+from utils.aws_service import get_aws_secret 
 
 def get_database_url():
     if settings.ENV == "local":
