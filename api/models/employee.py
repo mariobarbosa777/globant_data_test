@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, TIMESTAMP, ForeignKey
-from .base import Base
+from .base import BaseModel
 
-class HiredEmployee(Base):
+class HiredEmployee(BaseModel):
     __tablename__ = "hired_employees"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
