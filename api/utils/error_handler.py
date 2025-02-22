@@ -1,6 +1,38 @@
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from api.models.rejected_record import RejectedRecord
+import json
+
+async def handle_rejected_record(
+    request: Request, db: AsyncSession, table_name: str, raw_data: list[dict], error: Exception
+):
+    """
+    Inserta transacciones fallidas en `rejected_records` y devuelve un error HTTP 400.
+    """
+    rejected_entries = [
+        RejectedRecord(
+            table_name=table_name,
+            raw_data=json.dumps(record), 
+            error_message=str(error)
+        )
+        for record in raw_data
+    ]
+
+    db.add_all(rejected_entries)
+    await db.commit()
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "detail": f"Error insertando en {table_name}. Ver rejected_records.",
+            "error_message": str(error),
+            "path": request.url.path
+        }
+    )
+
+
 
 async def db_exception_handler(request: Request, exc: Exception):
     error_details = {
