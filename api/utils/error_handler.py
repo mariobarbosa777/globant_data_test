@@ -5,7 +5,11 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from models.rejected_record import RejectedRecord
 
 async def handle_rejected_record(
-    request: Request, db: AsyncSession, table_name: str, raw_data: list[dict], error: Exception
+    request: Request, 
+    db: AsyncSession, 
+    table_name: str, 
+    raw_data: list[dict], 
+    error: Exception
 ):
     """
     Inserta transacciones fallidas en `rejected_records` y devuelve un error HTTP 400.
@@ -13,7 +17,7 @@ async def handle_rejected_record(
     rejected_entries = [
         RejectedRecord(
             table_name=table_name,
-            raw_data=record, 
+            raw_data=record["raw_data"], 
             error_message=str(error)
         )
         for record in raw_data

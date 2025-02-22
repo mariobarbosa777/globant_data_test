@@ -36,14 +36,24 @@ async def process_batch_insert(db: AsyncSession, request: Request, model, table_
     for data in batch_data:
         record = await insert_record(db, model, data)
         if record:
-            inserted_records.append(record)
+            inserted_records.append(record.to_dict())
         else:
-            rejected_records.append(data)
+            rejected_records.append({"raw_data": data, "reason": "Registro duplicado o inválido"})
 
     if rejected_records:
         await handle_rejected_record(request, db, table_name, rejected_records, "IntegrityError: Registro duplicado o inválido")
 
-    return inserted_records 
+    dict_salida = {        
+        "inserted": inserted_records,  
+        "rejected": rejected_records   
+    }
+    print(f"salida: {dict_salida}")
+
+
+    return {
+        "inserted": inserted_records,  
+        "rejected": rejected_records   
+    }
         
 
 # 📌 Funciones para Departments

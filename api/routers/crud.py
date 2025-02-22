@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
+from schemas.common import BatchInsertResponse
 from schemas.department_schema import DepartmentBatchCreate, DepartmentResponse
 from schemas.job_schema import JobBatchCreate, JobResponse
 from schemas.employee_schema import EmployeeBatchCreate, EmployeeResponse
@@ -17,7 +18,7 @@ router = APIRouter()
 async def list_departments(db: AsyncSession = Depends(get_db)):
     return await get_all_departments(db)
 
-@router.post("/departments/batch/", response_model=list[DepartmentResponse])
+@router.post("/departments/batch/", response_model=BatchInsertResponse)
 async def add_departments_batch(
     request: Request,
     department_batch: DepartmentBatchCreate, 
@@ -31,7 +32,7 @@ async def add_departments_batch(
 async def list_jobs(db: AsyncSession = Depends(get_db)):
     return await get_all_jobs(db)
 
-@router.post("/jobs/batch/", response_model=list[JobResponse])
+@router.post("/jobs/batch/", response_model=BatchInsertResponse)
 async def add_jobs_batch(
     request: Request,
     job_batch: JobBatchCreate, 
@@ -45,7 +46,7 @@ async def add_jobs_batch(
 async def list_employees(db: AsyncSession = Depends(get_db)):
     return await get_all_employees(db)
     
-@router.post("/employees/batch/", response_model=list[EmployeeResponse])
+@router.post("/employees/batch/", response_model=BatchInsertResponse)
 async def add_employees_batch(
     request: Request,
     employee_batch: EmployeeBatchCreate, 

@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, TIMESTAMP, Text
 from sqlalchemy.dialects.postgresql import JSONB
-from .base import Base
+from .base import BaseModel
 from datetime import datetime
 
-class RejectedRecord(Base):
+class RejectedRecord(BaseModel):
     __tablename__ = "rejected_records"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
