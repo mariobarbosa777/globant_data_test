@@ -4,7 +4,7 @@ from typing import List
 
 class EmployeeBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255, description="Nombre del empleado")
-    datetime: datetime = Field(..., description="Fecha y hora de contratación")
+    datetime_: datetime = Field(...,alias="datetime", description="Fecha y hora de contratación")
     department_id: int = Field(..., gt=0, description="ID del departamento al que pertenece")
     job_id: int = Field(..., gt=0, description="ID del trabajo asignado")
 
@@ -16,6 +16,8 @@ class EmployeeResponse(EmployeeBase):
 
     class Config:
         from_attributes = True
+        populate_by_name = True
+
 
 class EmployeeBatchCreate(BaseModel):
     employees: List[EmployeeCreate] = Field(..., min_length=1, max_length=1000)

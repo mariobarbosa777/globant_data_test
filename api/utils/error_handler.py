@@ -2,8 +2,7 @@ from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from api.models.rejected_record import RejectedRecord
-import json
+from models.rejected_record import RejectedRecord
 
 async def handle_rejected_record(
     request: Request, db: AsyncSession, table_name: str, raw_data: list[dict], error: Exception
@@ -14,7 +13,7 @@ async def handle_rejected_record(
     rejected_entries = [
         RejectedRecord(
             table_name=table_name,
-            raw_data=json.dumps(record), 
+            raw_data=record, 
             error_message=str(error)
         )
         for record in raw_data
