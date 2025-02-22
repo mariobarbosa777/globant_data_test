@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from config import settings
 from routers import crud
 from utils.logger import LoggingMiddleware
+from utils.error_handler import db_exception_handler
 from utils.middleware import setup_middlewares  
 
 # Inicializar FastAPI
@@ -16,6 +17,10 @@ app = FastAPI(
 # Configurar middlewares
 setup_middlewares(app)
 app.add_middleware(LoggingMiddleware)
+
+# Agregar manejo global de errores de base de datos
+app.add_exception_handler(SQLAlchemyError, db_exception_handler)
+
 
 # # Registrar routers
 app.include_router(crud.router, prefix="/crud", tags=["CRUD"])
