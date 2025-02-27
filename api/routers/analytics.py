@@ -2,8 +2,8 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from api.database import get_db
-from api.schemas.analytics_schema import QuarterlyHiringReport, HighHiringDepartments
+from database import get_db
+from schemas.analytics_schema import QuarterlyHiringReport, HighHiringDepartments
 
 router = APIRouter()
 

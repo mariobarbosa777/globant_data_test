@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from config import settings
-from routers import crud
+from routers import crud, analytics
 from utils.logger import LoggingMiddleware
 from utils.error_handler import db_exception_handler, global_exception_handler
 from utils.middleware import setup_middlewares  
