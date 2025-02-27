@@ -3,9 +3,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.database import get_db
-from api.schemas.analytics_schema import QuarterlyHiringReport
+from api.schemas.analytics_schema import QuarterlyHiringReport, HighHiringDepartments
 
 router = APIRouter()
+
 
 @router.get("/quarterly-hiring", response_model=List[QuarterlyHiringReport])
 async def quarterly_hiring_report(db: AsyncSession = Depends(get_db)):
@@ -27,4 +28,31 @@ async def quarterly_hiring_report(db: AsyncSession = Depends(get_db)):
     """)
     result = await db.execute(query)
     rows = result.mappings().all()  # Devuelve una lista de diccionarios
+    return rows
+
+
+@router.get("/high-hiring-departments", response_model=List[HighHiringDepartments])
+async def high_hiring_departments(db: AsyncSession = Depends(get_db)):
+    query = text("""
+        WITH department_hires AS (
+            SELECT 
+                d.id,
+                d.department,
+                COUNT(he.id) AS total_hired
+            FROM hired_employees he
+            JOIN departments d ON he.department_id = d.id
+            WHERE EXTRACT(YEAR FROM he.datetime) = 2021
+            GROUP BY d.id, d.department
+        ),
+        mean_hired AS (
+            SELECT AVG(total_hired) AS avg_hires FROM department_hires
+        )
+        SELECT dh.id, dh.department, dh.total_hired
+        FROM department_hires dh
+        JOIN mean_hired mh ON dh.total_hired > mh.avg_hires
+        ORDER BY dh.total_hired DESC
+    """)
+    
+    result = await db.execute(query)
+    rows = result.mappings().all()
     return rows
