@@ -80,3 +80,8 @@ FROM temp_hired_employees
 WHERE id IS NULL OR name IS NULL OR datetime IS NULL OR department_id IS NULL OR job_id IS NULL;
 
 DROP TABLE temp_hired_employees;
+
+-- Ajustar las secuencias para que empiecen desde el ID más alto 
+SELECT setval('departments_id_seq', (SELECT COALESCE(MAX(id), 1) FROM departments) );
+SELECT setval('jobs_id_seq', (SELECT COALESCE(MAX(id), 1) FROM jobs) );
+SELECT setval('hired_employees_id_seq', (SELECT COALESCE(MAX(id), 1) FROM hired_employees) );
