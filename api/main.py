@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from config import settings
-from routers import crud
+from routers import crud, analytics
 from utils.logger import LoggingMiddleware
 from utils.error_handler import db_exception_handler, global_exception_handler
 from utils.middleware import setup_middlewares  
@@ -26,8 +26,8 @@ app.add_exception_handler(Exception, global_exception_handler)
 
 # # Registrar routers
 app.include_router(crud.router, prefix="/crud", tags=["CRUD"])
-# app.include_router(jobs.router, prefix="/jobs", tags=["Jobs"])
-# app.include_router(employees.router, prefix="/employees", tags=["Employees"])
+app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
+
 
 # Endpoint de Health Check
 @app.get("/health", tags=["Health"])
