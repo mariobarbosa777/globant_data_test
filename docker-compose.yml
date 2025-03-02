@@ -22,3 +22,49 @@ services:
       - "8000:8000"
     volumes:
       - ./api:/app 
+
+  postgres_airflow:
+    image: postgres:16
+    container_name: postgres_airflow
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      retries: 5
+
+  webserver:
+    image: apache/airflow:2.10.5-python3.9
+    container_name: airflow_webserver
+    restart: always
+    depends_on:
+      - postgres_airflow 
+    env_file:
+      - ./airflow/.env
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
+    entrypoint: ["/bin/bash", "-c", "
+      airflow db init &&
+      airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin &&
+      airflow webserver"
+    ]
+
+  scheduler:
+    image: apache/airflow:2.10.5-python3.9
+    container_name: airflow_scheduler
+    restart: always
+    depends_on:
+      - postgres_airflow
+    env_file:
+      - ./airflow/.env
+    entrypoint: ["/bin/bash", "-c", "
+      airflow scheduler"
+    ]
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
