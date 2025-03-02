@@ -1,5 +1,4 @@
 from airflow import DAG
-from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.decorators import dag, task
 from datetime import datetime
 
@@ -24,11 +23,14 @@ def backup_tables():
 
 
     @task.virtualenv(
+        system_site_packages=True,
         requirements=["fastavro==1.10.0"]
         )
     def backup_table(table_name, backup_dir, conn_id):
         """Extrae datos usando PostgresHook y guarda en AVRO."""
         import os
+        from airflow.decorators import dag, task
+        from datetime import datetime
         from fastavro import writer, parse_schema
 
         os.makedirs(backup_dir, exist_ok=True)
