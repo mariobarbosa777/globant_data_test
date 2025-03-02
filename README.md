@@ -33,7 +33,7 @@ Esta API ha sido desarrollada como parte de un challenge técnico para el rol de
 - **Seguridad:** Passlib (para hashing de contraseñas), OAuth2 JWT (pendiente)
 - **Backups:** FastAVRO
 - **Docker:** Contenedores para API y DB
-
+- **Airflow** (automatización de backups y cargas de datos)
 ---
 
 ## 📂 **Estructura del Proyecto**
@@ -76,6 +76,15 @@ docker-compose up --build
 
 4️⃣ **Acceder a la documentación interactiva:**
 📌 Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+4️⃣ **Acceder a la UI de Airflow:**
+📌URL: http://localhost:8080
+Usuario: airflow
+Contraseña: airflow
+
+4️⃣ **DAGs Implementadas:**
+1️⃣ backup_tables → Genera backups en formato AVRO para cada tabla.
+2️⃣ load_backup → Carga un backup en la base de datos.
 
 ---
 ## 🔐 **Autenticación (Pendiente)**
